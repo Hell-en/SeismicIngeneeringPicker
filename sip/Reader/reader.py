@@ -17,7 +17,6 @@ class Reader:
         self.path = path
         self.pick = pick
 
-
     def _create_df(self):
         df_header = pd.read_csv(self.path)
 
@@ -65,7 +64,7 @@ class Reader:
 
 
     def generate_data(self):
-        df_header_subset, df_header_test = Reader.create_df
+        df_header_subset, df_header_test = Reader.create_df()
         x, y_pick, y_det, y_mask, y_heavi = Reader._gen_set(self.path, df_header_subset)
         x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = Reader._gen_set(self.path, df_header_test)
         return 0 # what to return? what we need?
