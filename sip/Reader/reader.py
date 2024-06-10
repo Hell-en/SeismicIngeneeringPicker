@@ -67,4 +67,4 @@ class Reader:
         df_header_subset, df_header_test = Reader.create_df()
         x, y_pick, y_det, y_mask, y_heavi = Reader._gen_set(self.path, df_header_subset)
         x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = Reader._gen_set(self.path, df_header_test)
-        return 0 # what to return? what we need?
+        return x, y_pick, y_mask, x_test
