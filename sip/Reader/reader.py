@@ -11,7 +11,7 @@ from src import plot_maps
 
 class Reader:
 
-    """Class for reading input files: sgy and txt with values of FB"""
+    """Class for reading input files: .sgy and .txt with values of FB"""
 
     def __init__(self, path, pick):
         self.path = path
