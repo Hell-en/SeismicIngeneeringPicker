@@ -16,23 +16,6 @@ class Reader:
     def __init__(self, path, pick):
         self.path = path
         self.pick = pick
-
-    def _create_df(self):
-        df_header = pd.read_csv(self.path)
-
-        n = round(len(df_header.index)*0.2)
-        df_header_subset = df_header.sample(n, random_state=37)
-        df_header_subset['FB_NTC'] = np.int32(df_header_subset['FB']*500)
-
-        all_inds = df_header.index.values
-        train_inds = df_header_subset.index.values
-        test_inds = np.setdiff1d(all_inds, train_inds)
-
-        df_header_test = df_header.iloc[test_inds]
-        df_header_test = df_header.iloc[test_inds].sample(random_state=37) # changed. check if ok
-        df_header_test['FB_NTC'] = df_header_test['FB']*500
-
-        return df_header_subset, df_header_test
     
 
     @staticmethod
@@ -61,6 +44,24 @@ class Reader:
         y_map = np.cumsum(heaviside, axis=1)
         y_heavi = to_categorical(y_map, num_classes=2)
         return x, y_pick, y_det, y_mask, y_heavi
+    
+
+    def _create_df(self):
+        df_header = pd.read_csv(self.path)
+
+        n = round(len(df_header.index)*0.2)
+        df_header_subset = df_header.sample(n, random_state=37)
+        df_header_subset['FB_NTC'] = np.int32(df_header_subset['FB']*500)
+
+        all_inds = df_header.index.values
+        train_inds = df_header_subset.index.values
+        test_inds = np.setdiff1d(all_inds, train_inds)
+
+        df_header_test = df_header.iloc[test_inds]
+        df_header_test = df_header.iloc[test_inds].sample(random_state=37) # changed. check if ok
+        df_header_test['FB_NTC'] = df_header_test['FB']*500
+
+        return df_header_subset, df_header_test
 
 
     def generate_data(self):
