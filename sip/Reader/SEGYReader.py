@@ -13,6 +13,7 @@ class Reader:
 
     """Class for reading input files: .sgy and .txt with values of FB"""
 
+
     def __init__(self, path, pick):
         self.path = path
         self.pick = pick
@@ -33,13 +34,10 @@ class Reader:
         y_zeros = np.fliplr(np.cumsum(np.fliplr(heaviside), axis=1))
         y_pick = to_categorical(y, num_classes=x.shape[1])
 
-        ### mask
         y_mask = np.stack((y_zeros, y_pick, y_map), axis=2)
 
-        ### det
         y_det = to_categorical(y_pick, num_classes=2)
 
-        # ### heavi
         heaviside = to_categorical(y, num_classes=x.shape[1])
         y_map = np.cumsum(heaviside, axis=1)
         y_heavi = to_categorical(y_map, num_classes=2)
