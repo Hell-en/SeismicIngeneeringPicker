@@ -1,5 +1,8 @@
 class Preparer:
 
+""" Class for preparing income data and creating datasets"""
+
+
 @staticmethod
     def _gen_set(path, df_header_subset):
         x = segyrw.read_sgy_traces(path, df_header_subset['IDX'].astype(int).values)
