@@ -45,7 +45,7 @@ class Preparer:
     def _create_df(self):
         df_header = pd.read_csv(self.path)
 
-        n = round(len(df_header.index)*0.2)
+        n = round(len(df_header.index)*0.2)  #shoulf be changeable parameter for test size
         df_header_subset = df_header.sample(n, random_state=37)
         df_header_subset['FB_NTC'] = np.int32(df_header_subset['FB']*500)
 
