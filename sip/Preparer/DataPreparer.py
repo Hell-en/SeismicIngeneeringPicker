@@ -1,3 +1,17 @@
+
+import pandas as pd
+import numpy as np
+import glob
+import re
+
+from tensorflow.keras.utils import to_categorical
+
+from src import segyrw
+from src import dsp
+from src import plot_seismic
+from src import plot_maps
+
+
 class Preparer:
 
 """ Class for preparing income data and creating datasets"""
