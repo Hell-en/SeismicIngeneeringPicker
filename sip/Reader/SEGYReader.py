@@ -17,53 +17,25 @@ class Reader:
     def __init__(self, path, pick):
         self.path = path
         self.pick = pick
+
+
+    def get_file_names(self,):
+        txtfiles = []
+        for file in glob.glob("*.sgy"): # отсечь лишнее
+            txtfiles.append(file)
+
+
+    def get_sou_num(file_name):
+      string = string[:-4]  # get rid of .sgy
+      string = file_name
+      num = 0
+      string = re.sub(r'^.*?_', '', string) # delete before _
+      string = string.replace(re.search(r'(?:_)(.*)', string).group(), '') ## delete afetr _
+
+      if string[0] == '-':  #starts with -
+          num =  -int(string[1:].lstrip('0')) ## then
+      else:
+          num = int(string.lstrip('0'))
+      return num
+
     
-
-    @staticmethod
-    def _gen_set(path, df_header_subset):
-        x = segyrw.read_sgy_traces(path, df_header_subset['IDX'].astype(int).values)
-        y = df_header_subset['FB_NTC'].astype(int).values
-    
-        x = dsp.normalize_traces_by_std(x, 255, axis=1)
-        x = dsp.normalize_traces(x, scale_type='std')
-        x = np.expand_dims(x, axis=-1)
-    
-        heaviside = to_categorical(y+1, num_classes=x.shape[1])
-        y_map = np.cumsum(heaviside, axis=1)
-        heaviside = to_categorical(y-1, num_classes=x.shape[1])
-        y_zeros = np.fliplr(np.cumsum(np.fliplr(heaviside), axis=1))
-        y_pick = to_categorical(y, num_classes=x.shape[1])
-
-        y_mask = np.stack((y_zeros, y_pick, y_map), axis=2)
-
-        y_det = to_categorical(y_pick, num_classes=2)
-
-        heaviside = to_categorical(y, num_classes=x.shape[1])
-        y_map = np.cumsum(heaviside, axis=1)
-        y_heavi = to_categorical(y_map, num_classes=2)
-        return x, y_pick, y_det, y_mask, y_heavi
-    
-
-    def _create_df(self):
-        df_header = pd.read_csv(self.path)
-
-        n = round(len(df_header.index)*0.2)
-        df_header_subset = df_header.sample(n, random_state=37)
-        df_header_subset['FB_NTC'] = np.int32(df_header_subset['FB']*500)
-
-        all_inds = df_header.index.values
-        train_inds = df_header_subset.index.values
-        test_inds = np.setdiff1d(all_inds, train_inds)
-
-        df_header_test = df_header.iloc[test_inds]
-        df_header_test = df_header.iloc[test_inds].sample(random_state=37) # changed. check if ok
-        df_header_test['FB_NTC'] = df_header_test['FB']*500
-
-        return df_header_subset, df_header_test
-
-
-    def generate_data(self):
-        df_header_subset, df_header_test = Reader.create_df()
-        x, y_pick, y_det, y_mask, y_heavi = Reader._gen_set(self.path, df_header_subset)
-        x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = Reader._gen_set(self.path, df_header_test)
-        return x, y_pick, y_mask, x_test
