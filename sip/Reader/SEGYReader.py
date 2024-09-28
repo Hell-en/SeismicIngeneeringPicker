@@ -1,12 +1,5 @@
-import pandas as pd
-import numpy as np
-
-from tensorflow.keras.utils import to_categorical
-
-from src import segyrw
-from src import dsp
-from src import plot_seismic
-from src import plot_maps
+import glob
+import re
 
 
 class Reader:

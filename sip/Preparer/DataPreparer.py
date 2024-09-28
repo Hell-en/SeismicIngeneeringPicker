@@ -1,23 +1,17 @@
 
 import pandas as pd
 import numpy as np
-import glob
-import re
-
-from tensorflow.keras.utils import to_categorical
-
 from src import segyrw
 from src import dsp
-from src import plot_seismic
-from src import plot_maps
+from tensorflow.keras.utils import to_categorical
 
 
 class Preparer:
 
-""" Class for preparing income data and creating datasets"""
+    """ Class for preparing income data and creating datasets"""
 
 
-@staticmethod
+    @staticmethod
     def _gen_set(path, df_header_subset):
         x = segyrw.read_sgy_traces(path, df_header_subset['IDX'].astype(int).values)
         y = df_header_subset['FB_NTC'].astype(int).values
@@ -61,7 +55,7 @@ class Preparer:
 
 
     def generate_data(self):
-        df_header_subset, df_header_test = Reader.create_df()
-        x, y_pick, y_det, y_mask, y_heavi = Reader._gen_set(self.path, df_header_subset)
-        x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = Reader._gen_set(self.path, df_header_test)
-        return x, y_pick, y_mask, x_testtes
+        df_header_subset, df_header_test = self.create_df()
+        x, y_pick, y_det, y_mask, y_heavi = self._gen_set(self.path, df_header_subset)
+        x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = self._gen_set(self.path, df_header_test)
+        return x, y_pick, y_mask, x_test
