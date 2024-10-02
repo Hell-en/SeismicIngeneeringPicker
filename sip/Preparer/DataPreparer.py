@@ -1,9 +1,9 @@
-
 import pandas as pd
 import numpy as np
 from src import segyrw
 from src import dsp
 from tensorflow.keras.utils import to_categorical
+import Reader
 
 
 class Preparer:
@@ -13,8 +13,8 @@ class Preparer:
 
     @staticmethod
     def _gen_set(path, df_header_subset):
-        x = segyrw.read_sgy_traces(path, df_header_subset['IDX'].astype(int).values)
-        y = df_header_subset['FB_NTC'].astype(int).values
+        x = segyrw.read_sgy_traces(path, df_header_subset['SOU_X'].astype(int).values) # CHANGE INSIDE
+        y = df_header_subset['FB'].astype(int).values
     
         x = dsp.normalize_traces_by_std(x, 255, axis=1)
         x = dsp.normalize_traces(x, scale_type='std')
@@ -36,26 +36,51 @@ class Preparer:
         return x, y_pick, y_det, y_mask, y_heavi
     
 
-    def _create_df(self):
+    def _create_df(self, train_percent): # train_percent - 0/0.2 или др объем Train data from all data
         df_header = pd.read_csv(self.path)
 
-        n = round(len(df_header.index)*0.2)  #shoulf be changeable parameter for test size
+        n = round(len(df_header.index)*train_percent)
         df_header_subset = df_header.sample(n, random_state=37)
-        df_header_subset['FB_NTC'] = np.int32(df_header_subset['FB']*500)
 
         all_inds = df_header.index.values
         train_inds = df_header_subset.index.values
         test_inds = np.setdiff1d(all_inds, train_inds)
 
         df_header_test = df_header.iloc[test_inds]
-        df_header_test = df_header.iloc[test_inds].sample(random_state=37) # changed. check if ok
-        df_header_test['FB_NTC'] = df_header_test['FB']*500
+        df_header_test = df_header.iloc[test_inds].sample(random_state=37)
 
         return df_header_subset, df_header_test
 
 
     def generate_data(self):
-        df_header_subset, df_header_test = self.create_df()
-        x, y_pick, y_det, y_mask, y_heavi = self._gen_set(self.path, df_header_subset)
-        x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = self._gen_set(self.path, df_header_test)
+        list_of_files = []
+        part = 0.2 # 0 для исслед, когда обученную модель тестить on new data
+        df_header_subset, df_header_test = self._create_df(part)
+        print("check df  ", df_header_subset.columns) # to check
+
+        Reader.get_file_names(list_of_files)
+        print("check list_of_files  ", list_of_files) # to check
+
+        x, y_pick, y_det, y_mask, y_heavi = [], [], [], [], []
+        x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = [], [], [], [], []
+
+
+        for file in list_of_files:  #sgy
+            num_file = Reader.get_source_num(file)
+            print("num_file = ", num_file)
+            # далее надо склеивать данные в один df
+            ex, p, d, m, h = self._gen_set(file, df_header_subset[df_header_subset['SOU_X'] == num_file]) # df_header_subset[df_header_subset.columns[0] == num_file]
+            x.append(ex)
+            y_pick.append(p)
+            y_det.append(d)
+            y_mask.append(m)
+            y_heavi.append(h)
+
+            ex, p, d, m, h = self._gen_set(file, df_header_subset[df_header_subset['SOU_X'] == num_file])
+            x_test.append(ex)
+            y_pick_test.append(p)
+            y_det_test.append(d)
+            y_mask_test.append(m)
+            y_heavi_test.append(h)
+
         return x, y_pick, y_mask, x_test

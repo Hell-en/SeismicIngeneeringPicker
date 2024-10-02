@@ -1,10 +1,12 @@
 from tensorflow.keras.layers import MaxPooling1D, AveragePooling1D
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Activation, BatchNormalization, Dropout, UpSampling1D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
+import Reader
 
 
 class Model:
@@ -13,13 +15,9 @@ class Model:
 
 
     def __init__(self, ):
-        pass
-
-
-    POOLING = {
+        self.POOLING = {
         'max': MaxPooling1D,
-        'average': AveragePooling1D,
-    }
+        'average': AveragePooling1D, }
 
 
     def conv1d_block(self,
@@ -33,14 +31,14 @@ class Model:
         pooling=None,
         upsampling=None,
         pooling_type='max',
-        seed=37
-    ):
+        seed=37):
+
         x = Conv1D(
             filters,
             kernel_size=kernel_size,
             activation=None,
-            padding='same'
-        )(layer)
+            padding='same')(layer)
+        
         if acivation_after_batch:
             x = BatchNormalization()(x) if batch_norm else x
             x = Activation(activation)(x)
@@ -54,6 +52,7 @@ class Model:
         return x
 
 
+    @staticmethod
     def model_conv1d(
         n_cl,
         shape=None,
@@ -71,10 +70,9 @@ class Model:
         acivation_after_batch=False,
         pooling=None,
         lr=.001,
-        decay=.0,
-    ):
-        input_img = Input(shape=(shape, channels))
+        decay=.0,):
 
+        input_img = Input(shape=(shape, channels))
         x = input_img
         for i in range(depth):
             x = Model.conv1d_block(
@@ -88,8 +86,7 @@ class Model:
                pooling=pooling,
                upsampling=None,
                pooling_type='max',
-               seed=37,
-            )
+               seed=37,)
         x = Model.conv1d_block(
             x,
             n_cl,
@@ -101,8 +98,7 @@ class Model:
             pooling=None,
             upsampling=None,
             pooling_type='max',
-            seed=37,
-        )
+            seed=37,)
 
         model = Model(input_img, x, name="conv_segm")
 
@@ -110,21 +106,18 @@ class Model:
             learning_rate=lr,
             beta_1=0.9,
             beta_2=0.999,
-            amsgrad=False
-        )
+            amsgrad=False)
 
         loss = 'categorical_crossentropy'
         model.compile(
             optimizer=optimizer,
             loss=loss,
-            metrics=['accuracy']
-        )
+            metrics=['accuracy'])
         return model
 
-## _______________________- check whats above
 
-
-    def create_model(y_mask, x): ## get y_mask, x from READER/PREPARER
+    @staticmethod
+    def create_model(y_mask, x): ## get y_mask, x from PREPARER
         model = Model.model_conv1d(
            y_mask.shape[-1],
            shape = x.shape[1],
@@ -139,22 +132,22 @@ class Model:
            batch_norm=True,
            acivation_after_batch=False,
            pooling=None,
-           lr=0.001,
-        )
+           lr=0.001,)
         return model
 
 
+    @staticmethod
     def set_checkponits():
         model_checkpoint_callback = ModelCheckpoint(
-           filepath='models/weights/new_model_with_random_training_data', ## change path!
-           save_weights_only=True,
-           monitor='val_accuracy',
-           mode='max',
-           save_best_only=True
-           )
+            filepath='models/weights/new_model_with_random_training_data', ## change path!
+            save_weights_only=True,
+            monitor='val_accuracy',
+            mode='max',
+            save_best_only=True)
         return model_checkpoint_callback
 
     
+    @staticmethod
     def fit_model(model, x, y_mask):
         history = model.fit(
         x,
@@ -163,14 +156,14 @@ class Model:
         batch_size=64,
         validation_split=0.375,
         verbose=True,
-        callbacks=[Model.set_checkponits()] ## ок сразу вызывать?
-        )
+        callbacks=[Model.set_checkponits()]) ## ок сразу вызывать?
         model.load_weights('../fb_picking_notebooks/models/model_weights_whole_area') ## ! change path
         return
 
 
+    @staticmethod
     def prediction():
-        x, _, y_mask, x_test = SEGYReader.generate_data() #import SEGTReader
+        x, _, y_mask, x_test = Reader.generate_data() #import SEGYReader
         testmodel = Model.create_model(y_mask, x)
         Model.fit_model(testmodel, x, y_mask)
         res = testmodel.predict(x_test)

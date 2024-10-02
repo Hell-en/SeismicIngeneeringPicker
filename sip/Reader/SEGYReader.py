@@ -12,23 +12,28 @@ class Reader:
         self.pick = pick
 
 
-    def get_file_names(self,):
-        txtfiles = []
-        for file in glob.glob("*.sgy"): # отсечь лишнее
+    def get_file_names(self, txtfiles):
+        for file in glob.glob("*.sgy"): # отсечь лишние файлы в папке
             txtfiles.append(file)
 
 
-    def get_sou_num(file_name):
-      string = string[:-4]  # get rid of .sgy
-      string = file_name
-      num = 0
-      string = re.sub(r'^.*?_', '', string) # delete before _
-      string = string.replace(re.search(r'(?:_)(.*)', string).group(), '') ## delete afetr _
+    @staticmethod
+    def get_source_num(file_name): # -> int: # SOU_X - source number
+        # TYPE OF SGY IS  '../FB data/testArticleData/qqq_-0020_filtered.sgy'
+        string = file_name
+        string = string[:-4]  # get rid of '.sgy'
+        print(string)
+        num = 0
+        string = re.sub(r'^.*?_', '', string) # delete before _
+        string = string.replace(re.search(r'(?:_)(.*)', string).group(), '') ## delete after _
+        print(string)
 
-      if string[0] == '-':  #starts with -
-          num =  -int(string[1:].lstrip('0')) ## then
-      else:
-          num = int(string.lstrip('0'))
-      return num
-
-    
+        if string[0] == '-':  # if starts with '-'
+            num =  (-1)*int(string[1:].lstrip('0'))
+        else:
+            string = string.lstrip('0')
+            if (string == ''): # был 0000 = 0
+                num = 0
+            else:
+                num = int(string)
+        return num
