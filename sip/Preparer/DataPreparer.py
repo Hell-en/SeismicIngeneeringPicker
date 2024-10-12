@@ -11,9 +11,12 @@ class Preparer:
     """ Class for preparing income data and creating datasets"""
 
 
+    def __init__(self,):
+        pass
+    
     @staticmethod
     def _gen_set(path, df_header_subset):
-        x = segyrw.read_sgy_traces(path, df_header_subset['SOU_X'].astype(int).values) # CHANGE INSIDE
+        x = segyrw.read_sgy_traces(path, df_header_subset['SOU_X'].astype(int).values)
         y = df_header_subset['FB'].astype(int).values
     
         x = dsp.normalize_traces_by_std(x, 255, axis=1)
@@ -56,10 +59,8 @@ class Preparer:
         list_of_files = []
         part = 0.2 # 0 для исслед, когда обученную модель тестить on new data
         df_header_subset, df_header_test = self._create_df(part)
-        print("check df  ", df_header_subset.columns) # to check
 
         Reader.get_file_names(list_of_files)
-        print("check list_of_files  ", list_of_files) # to check
 
         x, y_pick, y_det, y_mask, y_heavi = [], [], [], [], []
         x_test, y_pick_test, y_det_test, y_mask_test, y_heavi_test = [], [], [], [], []
@@ -67,7 +68,6 @@ class Preparer:
 
         for file in list_of_files:  #sgy
             num_file = Reader.get_source_num(file)
-            print("num_file = ", num_file)
             # далее надо склеивать данные в один df
             ex, p, d, m, h = self._gen_set(file, df_header_subset[df_header_subset['SOU_X'] == num_file]) # df_header_subset[df_header_subset.columns[0] == num_file]
             x.append(ex)
