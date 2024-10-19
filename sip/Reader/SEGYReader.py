@@ -18,27 +18,15 @@ class Reader:
 
 
     @staticmethod
-    def get_source_num(file_name): # -> int: # SOU_X - source number
-        # TYPE OF SGY IS  '../FB data/testArticleData/qqq_-0020_filtered.sgy'
-        string = string[:-4]  # get rid of '.sgy'
-        string = file_name
+    def get_source_num(file_name):
+        pattern = r'^[^_]*_'
         num = 0
-        string = re.sub(r'^.*?_', '', string) # delete before _
-        string = string.replace(re.search(r'(?:_)(.*)', string).group(), '') ## delete after _
-        
-        # pattern = r'_(?P<sign>[-+]?)\d{4}\.'                                           
-        # match = re.search(pattern, file_name)
-        # if match:
-        #     # Формируем строку с учетом знака
-        #     number = f"{match.group('sign')}{match.group(0)[1:5]}"
-        #print(number)
-
-        if string[0] == '-':  # if starts with '-'
-            num =  (-1)*int(string[1:].lstrip('0'))
+        current = 0 # вспомогательная
+        s = re.sub(pattern, '', s)
+        if s.startswith('-'):
+            num.append((-1)*int(s[1:5].lstrip('0')))
         else:
-            string = string.lstrip('0')
-            if (string == ''): # был 0000 = 0
-                num = 0
-            else:
-                num = int(string)
+            current = s[0:4].lstrip('0')
+            if current == '': num.append(0)
+            else: num.append(int(s[0:4].lstrip('0')))
         return num
