@@ -158,7 +158,6 @@ class Model:
         verbose=True,
         callbacks=[Model.set_checkponits()]) ## ок сразу вызывать?
         model.load_weights('../fb_picking_notebooks/models/model_weights_whole_area') ## ! change path
-        return
 
 
     @staticmethod
