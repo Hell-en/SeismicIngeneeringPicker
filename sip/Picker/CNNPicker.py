@@ -11,7 +11,9 @@ import Reader
 
 class Model:
 
-    """Class for work with FB prediction model"""
+    """
+    Class for work with FB prediction model
+    """
 
 
     def __init__(self, ):
