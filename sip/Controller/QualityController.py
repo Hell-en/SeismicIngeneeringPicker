@@ -4,10 +4,12 @@
 class Control:
 
 
-    """Class for checking quality of CNN FB prediction"""
+    """
+    Class for checking quality of CNN FB prediction
+    """
 
 
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
 
