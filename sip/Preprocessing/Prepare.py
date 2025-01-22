@@ -9,9 +9,11 @@ from Reader import SEGYReader
 
 
 class Preprocess:
-
-  @staticmethod
-  def sgy2npy(dir_path = '../FBdata/2016doroga/sgy/'):
+  """
+  
+  """
+  
+  def sgy2npy(self, dir_path = '../FBdata/2016doroga/sgy/'):
 
     filenames = os.listdir(dir_path)
     filenames
@@ -47,14 +49,15 @@ class Preprocess:
       trace_idx = np.asarray(trace_idx)
       picks_idx = np.asarray(picks_idx)
 
-      gather_with_picks = gather_merged[trace_idx]
+      gather_merged = gather_merged[trace_idx]
       picks_for_gather = np.int32(picks[picks_idx, 2] / dt_list[0])
 
-      np.save('Poligon2013.npy', gather_with_picks)
+      np.save('Doroga2016_picks.npy', gather_merged)
+      return gather_merged   #   TODO: deal with picks
 
 
-@staticmethod
-def plot_(idx):  # with picks
+def plot_(self, idx):  # with picks
+    gather_with_picks = self.sgy2npy()
     fig = plt.figure(figsize=(16, 4))
     plt.plot(gather_with_picks[idx])
     plt.axvline(picks_for_gather[idx], c='k', ls='dashed')
