@@ -10,7 +10,9 @@ from Reader import SEGYReader
 
 class Preprocess:
   """
-  
+  This class transform original data .segy into unified .npy with picks
+  Optionally add values of first-break from .txt
+  :param dir_path: full path to directory with 
   """
   
   def sgy2npy(self, dir_path = '../FBdata/2016doroga/sgy/'):
@@ -38,6 +40,7 @@ class Preprocess:
     else:
       trace_idx = []
       picks_idx = []
+      picks = [] ###   TODO: добавить путь 
       for i in range(picks.shape[0]):
         sx = picks[i, 0]
         rx = picks[i, 1]
