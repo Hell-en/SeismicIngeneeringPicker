@@ -4,7 +4,11 @@ import re
 
 class Reader:
 
-    """Class for reading input files: .sgy and .txt with values of FB"""
+    """
+    Class for reading original files: .sgy and .txt with values of FB
+    :param path: full path to .segy file
+    "param pick: full path to .txt file
+    """
 
 
     def __init__(self, path, pick):
