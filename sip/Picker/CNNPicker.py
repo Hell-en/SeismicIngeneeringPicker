@@ -158,7 +158,7 @@ class Model:
         batch_size=64,
         validation_split=0.375,
         verbose=True,
-        callbacks=[Model.set_checkponits()]) ## ок сразу вызывать?
+        callbacks=[Model.set_checkponits()])
         model.load_weights('../fb_picking_notebooks/models/model_weights_whole_area') ## ! change path
 
 
