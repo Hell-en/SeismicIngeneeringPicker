@@ -6,20 +6,20 @@ from tensorflow.keras.layers import Activation, BatchNormalization, Dropout, UpS
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
-import Reader
 
 
-class Model:
+class CNNModel:
 
     """
     Class for work with FB prediction model
+    :param path_to_weights: full path to file for weights of the trained model to be written in
     """
 
-
-    def __init__(self, ):
+    def __init__(self, path_to_weights):
         self.POOLING = {
         'max': MaxPooling1D,
         'average': AveragePooling1D, }
+        self.path_to_weights = path_to_weights
 
 
     def conv1d_block(self,
@@ -29,7 +29,7 @@ class Model:
         activation,
         dropout=None,
         batch_norm=True,
-        acivation_after_batch=False,
+        activation_after_batch=False,
         pooling=None,
         upsampling=None,
         pooling_type='max',
@@ -41,7 +41,7 @@ class Model:
             activation=None,
             padding='same')(layer)
         
-        if acivation_after_batch:
+        if activation_after_batch:
             x = BatchNormalization()(x) if batch_norm else x
             x = Activation(activation)(x)
         else:
@@ -69,7 +69,7 @@ class Model:
         last_dropout=None,
         dropout=.1,
         batch_norm=True,
-        acivation_after_batch=False,
+        activation_after_batch=False,
         pooling=None,
         lr=.001,
         decay=.0,):
@@ -84,7 +84,7 @@ class Model:
                 activation,
                 dropout=dropout,
                 batch_norm=batch_norm,
-               acivation_after_batch=acivation_after_batch,
+               activation_after_batch=activation_after_batch,
                pooling=pooling,
                upsampling=None,
                pooling_type='max',
@@ -96,7 +96,7 @@ class Model:
             last_activation,
             dropout=last_dropout,
             batch_norm=last_batch_norm,
-            acivation_after_batch=acivation_after_batch,
+            activation_after_batch=activation_after_batch,
             pooling=None,
             upsampling=None,
             pooling_type='max',
@@ -119,7 +119,7 @@ class Model:
 
 
     @staticmethod
-    def create_model(y_mask, x): ## get y_mask, x from PREPARER
+    def create_model(x, y_mask):
         model = Model.model_conv1d(
            y_mask.shape[-1],
            shape = x.shape[1],
@@ -138,19 +138,17 @@ class Model:
         return model
 
 
-    @staticmethod
-    def set_checkponits():
+    def set_checkpoints(self):
         model_checkpoint_callback = ModelCheckpoint(
-            filepath='models/weights/new_model_with_random_training_data', ## change path!
+            filepath=self.path_to_weights,
             save_weights_only=True,
             monitor='val_accuracy',
             mode='max',
             save_best_only=True)
         return model_checkpoint_callback
 
-    
-    @staticmethod
-    def fit_model(model, x, y_mask):
+
+    def fit_model(self, model, x, y_mask):
         history = model.fit(
         x,
         y_mask,
@@ -159,14 +157,13 @@ class Model:
         validation_split=0.375,
         verbose=True,
         callbacks=[Model.set_checkponits()])
-        model.load_weights('../fb_picking_notebooks/models/model_weights_whole_area') ## ! change path
+        model.load_weights(self.path_to_weights)
 
 
-    @staticmethod
-    def prediction():
+    def prediction(self):
         x, _, y_mask, x_test = Reader.generate_data() #import SEGYReader
-        testmodel = Model.create_model(y_mask, x)
-        Model.fit_model(testmodel, x, y_mask)
-        res = testmodel.predict(x_test)
-        lst_pred = [np.argmax(res[i, :, 1]) for i in range(res.shape[0])]
-        return lst_pred
+        cnn_model = self.create_model(y_mask, x)
+        Model.fit_model(cnn_model, x, y_mask)
+        res = cnn_model.predict(x_test)
+        list_predicted = [np.argmax(res[i, :, 1]) for i in range(res.shape[0])]
+        return list_predicted
