@@ -59,7 +59,7 @@ class Preprocess:
             gather_merged = np.int32(picks[picks_idx, 2] / dt_list[0])
 
             np.save('Doroga2016_picks.npy', gather_merged)
-            return gather_merged
+        return gather_merged
 
 
     def plot_(self, idx, picks_for_gather):

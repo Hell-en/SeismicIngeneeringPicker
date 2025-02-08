@@ -118,10 +118,9 @@ class CNNModel:
         return model
 
 
-    @staticmethod
-    def create_model(x, y_mask):
-        model = Model.model_conv1d(
-           y_mask.shape[-1],
+    def create_model(self, x, y_mask=[]):
+        model = self.model_conv1d(
+           3, # y_mask.shape[-1]
            shape = x.shape[1],
            depth=4,
            filters=32,
@@ -132,7 +131,7 @@ class CNNModel:
            last_kernel_size=32,
            dropout=.5,
            batch_norm=True,
-           acivation_after_batch=False,
+           activation_after_batch=False,
            pooling=None,
            lr=0.001,)
         return model
@@ -148,7 +147,8 @@ class CNNModel:
         return model_checkpoint_callback
 
 
-    def fit_model(self, model, x, y_mask):
+    def create_fit_model(self, x, y_mask):
+        model = self.create_model(x, y_mask)
         history = model.fit(
         x,
         y_mask,
@@ -160,10 +160,8 @@ class CNNModel:
         model.load_weights(self.path_to_weights)
 
 
-    def prediction(self):
-        x, _, y_mask, x_test = Reader.generate_data() #import SEGYReader
-        cnn_model = self.create_model(y_mask, x)
-        Model.fit_model(cnn_model, x, y_mask)
+    @staticmethod
+    def prediction(cnn_model, x_test):
         res = cnn_model.predict(x_test)
         list_predicted = [np.argmax(res[i, :, 1]) for i in range(res.shape[0])]
         return list_predicted
