@@ -3,7 +3,7 @@ from Picker import CNNPicker
 from Controller import QualityController
 
 
-def processes(): # for no model learning
+def processes():
 
     processor = Preprocesser.Preprocess(dir_path='../FBdata/2016doroga/sgy/', picks_path='../FBdata/doroga_picks.txt')
     data, idx = processor.sgy2npy()
