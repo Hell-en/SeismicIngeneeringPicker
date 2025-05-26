@@ -25,12 +25,9 @@ NUMBER_OF_ATTRIBUTES = len(NAME_OF_ATTRIBUTES)
 
 
 class Reader:
-    """Класс для чтения сейсмических данных в формате .sgy.
+    """Class for .sgy seismic data reading 
 
-    Инициализирйуте объект путём до файла, который необходимо прочитать, затем вызовите нужный метод.
-
-    Args:
-            path (str): путь до файла.
+    :param path (str): path to file.
 
     """
 
